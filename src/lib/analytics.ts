@@ -13,6 +13,7 @@ export type AnalyticsEvent =
   | 'page_viewed'
 
 interface AnalyticsProperties {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }
 

@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 
-export default auth((req: NextRequest) => {
+export default auth(req => {
   // Protect API routes that require authentication
   if (
     req.nextUrl.pathname.startsWith('/api/repos') ||
@@ -9,8 +8,8 @@ export default auth((req: NextRequest) => {
     req.nextUrl.pathname.startsWith('/api/diff') ||
     req.nextUrl.pathname.startsWith('/api/create-pr')
   ) {
-    if (!(req as any).auth) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!req.auth) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
   }
 })
