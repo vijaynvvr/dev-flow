@@ -1,17 +1,72 @@
 // components/LandingPage.tsx
 import { signIn } from 'next-auth/react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Github, GitPullRequest, Sparkles, Zap, Shield, ArrowRight } from 'lucide-react'
+import { Github, GitPullRequest, Sparkles, Zap, Shield, ArrowRight, Loader2 } from 'lucide-react'
 import { analytics } from '@/lib/analytics'
 
 export default function LandingPage() {
+  const [isSigningIn, setIsSigningIn] = useState(false)
+  const [currentText, setCurrentText] = useState('')
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const phrases = [
+    'Perfect PR Descriptions',
+    'Professional Code Reviews',
+    'Intelligent Commit Analysis',
+    'Automated Documentation',
+    'Better Team Collaboration'
+  ]
+
+  const handleSignIn = async () => {
+    if (isSigningIn) return // Prevent multiple clicks
+    
+    try {
+      setIsSigningIn(true)
+      analytics.userSignedIn({ provider: 'github' })
+      await signIn('github')
+    } catch (error) {
+      console.error('Sign in error:', error)
+      setIsSigningIn(false) // Reset on error
+    }
+    // Note: Don't reset isSigningIn on success as user will be redirected
+  }
+
+  // Typing animation effect
+  useEffect(() => {
+    const currentPhrase = phrases[currentIndex]
+    const typingSpeed = isDeleting ? 50 : 100
+    const pauseTime = isDeleting ? 500 : 2000
+
+    const timeout = setTimeout(() => {
+      if (!isDeleting && currentText === currentPhrase) {
+        // Finished typing, start deleting after pause
+        setTimeout(() => setIsDeleting(true), pauseTime)
+      } else if (isDeleting && currentText === '') {
+        // Finished deleting, move to next phrase
+        setIsDeleting(false)
+        setCurrentIndex((prev) => (prev + 1) % phrases.length)
+      } else {
+        // Continue typing or deleting
+        setCurrentText(prev => 
+          isDeleting 
+            ? prev.slice(0, -1)
+            : currentPhrase.slice(0, prev.length + 1)
+        )
+      }
+    }, typingSpeed)
+
+    return () => clearTimeout(timeout)
+  }, [currentText, currentIndex, isDeleting, phrases]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
       {/* Header */}
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-6">
+      <header className="">
+        <div className="container mx-auto p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
@@ -20,22 +75,28 @@ export default function LandingPage() {
               <span className="text-xl font-bold">DevFlow</span>
             </div>
             <Button
-              onClick={() => {
-                analytics.userSignedIn({ provider: 'github' })
-
-                signIn('github')
-              }}
+              onClick={handleSignIn}
               variant="outline"
+              disabled={isSigningIn}
             >
-              <Github className="mr-2 h-4 w-4" />
-              Sign In
+              {isSigningIn ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing In...
+                </>
+              ) : (
+                <>
+                  <Github className="mr-2 h-4 w-4" />
+                  Sign In
+                </>
+              )}
             </Button>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-24">
+      <section className="container mx-auto px-4 py-16">
         <div className="text-center">
           <div className="mx-auto max-w-4xl">
             {/* Badge */}
@@ -44,15 +105,14 @@ export default function LandingPage() {
               AI-Powered Developer Tools
             </Badge>
 
-            {/* Main Headline */}
-            <h1 className="mb-6 text-5xl font-bold tracking-tight md:text-6xl">
-              Generate Perfect
+            {/* Main Headline with Typing Animation */}
+            <h1 className="mb-6 flex flex-col gap-4 text-5xl font-bold tracking-tight md:text-6xl">
+              <span>Generate{' '}</span>
               <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                {' '}
-                PR Descriptions
+                {currentText}
+                <span className="animate-pulse">|</span>
               </span>
-              <br />
-              in Seconds
+              <span>in Seconds</span>
             </h1>
 
             {/* Subtitle */}
@@ -66,22 +126,23 @@ export default function LandingPage() {
             <div className="mb-16 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button
                 size="lg"
-                onClick={() => {
-                  analytics.userSignedIn({
-                    provider: 'github',
-                  })
-                  signIn('github')
-                }}
+                onClick={handleSignIn}
                 className="text-lg"
+                disabled={isSigningIn}
               >
-                <Github className="mr-2 h-5 w-5" />
-                Get Started Free
-                <ArrowRight className="ml-2 h-5 w-5" />
+                {isSigningIn ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Connecting to GitHub...
+                  </>
+                ) : (
+                  <>
+                    <Github className="mr-2 h-5 w-5" />
+                    Get Started Free
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </>
+                )}
               </Button>
-              {/* <Button size="lg" variant="outline" className="text-lg">
-                <GitPullRequest className="mr-2 h-5 w-5" />
-                View Demo
-              </Button> */}
             </div>
 
             {/* Demo Preview */}
@@ -112,7 +173,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="bg-muted/30 py-24">
+      <section className="bg-muted/30 py-4">
         <div className="container mx-auto px-4">
           <div className="mb-16 text-center">
             <h2 className="mb-4 text-4xl font-bold">Why Developers Love DevFlow</h2>
@@ -174,7 +235,7 @@ export default function LandingPage() {
       </section>
 
       {/* How it Works */}
-      <section className="py-24">
+      <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="mb-16 text-center">
             <h2 className="mb-4 text-4xl font-bold">How It Works</h2>
@@ -223,17 +284,41 @@ export default function LandingPage() {
           <Button
             size="lg"
             variant="secondary"
-            onClick={() => {
-              analytics.userSignedIn({ provider: 'github' })
-              signIn('github')
-            }}
+            onClick={handleSignIn}
             className="text-lg"
+            disabled={isSigningIn}
           >
-            <Github className="mr-2 h-5 w-5" />
-            Start Free Now
+            {isSigningIn ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Starting Your Journey...
+              </>
+            ) : (
+              <>
+                <Github className="mr-2 h-5 w-5" />
+                Start Free Now
+              </>
+            )}
           </Button>
         </div>
       </section>
+
+      {/* Loading Overlay for Better UX */}
+      {isSigningIn && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <Card className="w-full max-w-md">
+            <CardContent className="flex flex-col items-center justify-center p-8">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <Loader2 className="h-8 w-8 animate-spin" />
+              </div>
+              <h3 className="mb-2 text-lg font-semibold">Connecting to GitHub</h3>
+              <p className="text-center text-sm text-muted-foreground">
+                Please wait while we redirect you to GitHub for secure authentication...
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="border-t bg-muted/30 py-12">
