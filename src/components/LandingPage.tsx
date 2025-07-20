@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Github, GitPullRequest, Sparkles, Zap, Shield, ArrowRight, Loader2 } from 'lucide-react'
 import { analytics } from '@/lib/analytics'
+import LoadingOverlay from './LoadingOverlay'
 
 export default function LandingPage() {
   const [isSigningIn, setIsSigningIn] = useState(false)
@@ -303,22 +304,13 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Loading Overlay for Better UX */}
-      {isSigningIn && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-          <Card className="w-full max-w-md">
-            <CardContent className="flex flex-col items-center justify-center p-8">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <Loader2 className="h-8 w-8 animate-spin" />
-              </div>
-              <h3 className="mb-2 text-lg font-semibold">Connecting to GitHub</h3>
-              <p className="text-center text-sm text-muted-foreground">
-                Please wait while we redirect you to GitHub for secure authentication...
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      {/* Loading Overlay for Sign In */}
+      <LoadingOverlay
+        isVisible={isSigningIn}
+        title="Connecting to GitHub"
+        description="Please wait while we redirect you to GitHub for secure authentication..."
+        icon={<Github className="h-8 w-8" />}
+      />
 
       {/* Footer */}
       <footer className="border-t bg-muted/30 py-12">
