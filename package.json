@@ -1,11 +1,10 @@
 {
   "name": "dev-flow",
   "version": "0.1.0",
-  "description": "AI-powered PR description generator created by Vijay",
+  "description": "AI-powered PR description generator",
   "private": true,
   "author": {
-    "name": "Vijay",
-    "url": "https://github.com/vijaynvvr"
+    "name": "Devflow"
   },
   "keywords": [
     "pr",
