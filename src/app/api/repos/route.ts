@@ -14,20 +14,31 @@ export async function GET() {
       auth: session.accessToken,
     })
 
-    const { data: repos } = await octokit.rest.repos.listForAuthenticatedUser({
-      sort: 'updated',
-      per_page: 100,
-    })
-
-    const reposData = repos.map(repo => ({
-      id: repo.id,
-      name: repo.name,
-      full_name: repo.full_name,
-      owner: repo.owner.login,
-      private: repo.private,
-      description: repo.description,
-      updated_at: repo.updated_at,
-    }))
+    const reposData = []
+    let page = 1
+    let hasMore = true
+    
+    while (hasMore) {
+      const { data: repos } = await octokit.rest.repos.listForAuthenticatedUser({
+        sort: 'updated',
+        per_page: 100,
+        page,
+        affiliation: 'owner,organization_member,collaborator', // Optional: for more coverage
+      })
+    
+      reposData.push(...repos.map(repo => ({
+        id: repo.id,
+        name: repo.name,
+        full_name: repo.full_name,
+        owner: repo.owner.login,
+        private: repo.private,
+        description: repo.description,
+        updated_at: repo.updated_at,
+      })))
+    
+      hasMore = repos.length === 100
+      page++
+    }    
 
     return NextResponse.json(reposData)
   } catch (error) {

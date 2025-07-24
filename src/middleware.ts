@@ -6,6 +6,8 @@ export default auth(req => {
     req.nextUrl.pathname.startsWith('/api/repos') ||
     req.nextUrl.pathname.startsWith('/api/branches') ||
     req.nextUrl.pathname.startsWith('/api/diff') ||
+    req.nextUrl.pathname.startsWith('/api/settings') ||
+    req.nextUrl.pathname.startsWith('/api/github/user') ||
     req.nextUrl.pathname.startsWith('/api/create-pr')
   ) {
     if (!req.auth) {

@@ -1,28 +1,32 @@
 // components/Header.tsx
 import { signOut, useSession } from 'next-auth/react'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { GitPullRequest, LogOut, Loader2 } from 'lucide-react'
-import { analytics } from '@/lib/analytics'
+import { GitPullRequest, LogOut, Loader2, Settings } from 'lucide-react'
 import LoadingOverlay from '@/components/LoadingOverlay'
 
 export default function Header() {
   const { data: session } = useSession()
   const [isSigningOut, setIsSigningOut] = useState(false)
+  const router = useRouter()
 
   const handleSignOut = async () => {
     if (isSigningOut) return // Prevent multiple clicks
     
     try {
       setIsSigningOut(true)
-      analytics.userSignedOut()
       await signOut()
     } catch (error) {
       console.error('Sign out error:', error)
       setIsSigningOut(false) // Reset on error
     }
     // Note: Don't reset isSigningOut on success as user will be redirected
+  }
+
+  const navigateToSettings = () => {
+    router.push('/settings')
   }
 
   return (
@@ -55,6 +59,16 @@ export default function Header() {
                   <p className="text-xs text-muted-foreground">Developer</p>
                 </div>
               </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={navigateToSettings}
+                aria-label="Settings"
+              >
+                <Settings className="h-4 w-4" />
+                <span className="ml-2 hidden sm:inline">Settings</span>
+              </Button>
 
               <Button
                 variant="ghost"

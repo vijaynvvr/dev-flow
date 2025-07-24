@@ -1,11 +1,10 @@
 // components/LandingPage.tsx
 import { signIn } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Github, GitPullRequest, Sparkles, Zap, Shield, ArrowRight, Loader2 } from 'lucide-react'
-import { analytics } from '@/lib/analytics'
 import LoadingOverlay from './LoadingOverlay'
 
 export default function LandingPage() {
@@ -14,20 +13,19 @@ export default function LandingPage() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const phrases = [
+  const phrases = useMemo(() => [
     'Perfect PR Descriptions',
     'Professional Code Reviews',
     'Intelligent Commit Analysis',
     'Automated Documentation',
     'Better Team Collaboration'
-  ]
+  ], []);
 
   const handleSignIn = async () => {
     if (isSigningIn) return // Prevent multiple clicks
     
     try {
       setIsSigningIn(true)
-      analytics.userSignedIn({ provider: 'github' })
       await signIn('github')
     } catch (error) {
       console.error('Sign in error:', error)

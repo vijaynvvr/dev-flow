@@ -22,17 +22,27 @@ export async function GET(request: NextRequest) {
       auth: session.accessToken,
     })
 
-    const { data: branches } = await octokit.rest.repos.listBranches({
-      owner,
-      repo,
-      per_page: 100,
-    })
+    const branchData = [];
+    let page = 1
+    let hasMore = true
 
-    const branchData = branches.map(branch => ({
-      name: branch.name,
-      sha: branch.commit.sha,
-      protected: branch.protected,
-    }))
+    while (hasMore) {
+      const { data: branches } = await octokit.rest.repos.listBranches({
+        owner,
+        repo,
+        per_page: 100,
+        page,
+      })
+
+      branchData.push(...branches.map(branch => ({
+        name: branch.name,
+        sha: branch.commit.sha,
+        protected: branch.protected,
+      })))
+
+      hasMore = branches.length === 100
+      page++
+    }
 
     return NextResponse.json(branchData)
   } catch (error) {

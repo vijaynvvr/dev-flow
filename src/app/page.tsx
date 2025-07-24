@@ -12,8 +12,6 @@ import RepositorySelector from '@/components/RepositorySelector'
 import DiffStats from '@/components/DiffStats'
 import PRDetails from '@/components/PRDetails'
 
-import { analytics } from '@/lib/analytics'
-
 interface Repository {
   id: number
   name: string
@@ -93,13 +91,6 @@ export default function Home() {
     try {
       setLoading(true)
 
-      // Track the attempt
-      analytics.branchesSelected({
-        repository: selectedRepo.name,
-        baseBranch,
-        targetBranch,
-      })
-
       const response = await fetch('/api/diff', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -119,15 +110,6 @@ export default function Home() {
           setPrTitle(`feat: merge ${targetBranch} into ${baseBranch}`)
         }
 
-        // Track successful generation
-        analytics.prDescriptionGenerated({
-          repository: selectedRepo.name,
-          baseBranch,
-          targetBranch,
-          filesChanged: result.stats?.totalFiles,
-          success: true,
-        })
-
         // Show warning if fallback was used
         if (result.fallback) {
           alert(
@@ -136,19 +118,6 @@ export default function Home() {
         }
       } else {
         const error = await response.json()
-        // Track failed generation
-        analytics.prDescriptionGenerated({
-          repository: selectedRepo.name,
-          baseBranch,
-          targetBranch,
-          success: false,
-        })
-
-        analytics.errorOccurred({
-          error_type: 'pr_generation_failed',
-          error_message: error.error,
-          page: 'main',
-        })
 
         if (response.status === 429) {
           alert(`Rate limit exceeded: ${error.error}`)
@@ -158,12 +127,6 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error generating description:', error)
-      // Track error
-      analytics.errorOccurred({
-        error_type: 'pr_generation_error',
-        error_message: error instanceof Error ? error.message : 'Unknown error',
-        page: 'main',
-      })
       alert('Failed to generate description')
     } finally {
       setLoading(false)
@@ -192,29 +155,12 @@ export default function Home() {
       if (response.ok) {
         const result = await response.json()
         setCreatedPrUrl(result.url)
-        // Track successful PR creation
-        analytics.prCreated({
-          repository: selectedRepo.name,
-          prUrl: result.url,
-        })
       } else {
         const error = await response.json()
-        // Track failed PR creation
-        analytics.errorOccurred({
-          error_type: 'pr_creation_failed',
-          error_message: error.error,
-          page: 'main',
-        })
-
         alert(`Error: ${error.error}`)
       }
     } catch (error) {
       console.error('Error creating PR:', error)
-      analytics.errorOccurred({
-        error_type: 'pr_creation_error',
-        error_message: error instanceof Error ? error.message : 'Unknown error',
-        page: 'main',
-      })
       alert('Failed to create pull request')
     } finally {
       setLoading(false)
@@ -233,11 +179,6 @@ export default function Home() {
     setCreatedPrUrl('')
 
     if (repo) {
-      // Track repository selection
-      analytics.repositorySelected({
-        repository: repo.name,
-        isPrivate: repo.private,
-      })
       fetchBranches(repo.owner, repo.name)
     }
   }

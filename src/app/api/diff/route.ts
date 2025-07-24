@@ -3,16 +3,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { Octokit } from '@octokit/rest'
 import { GoogleGenerativeAI } from '@google/generative-ai'
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+import { userSettings } from '@/lib/utils';
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
 
-    if (!session?.accessToken) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!session || !session.user?.email || !session?.accessToken) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
+
+    const userEmail = session.user.email;
+    const settings = userSettings.get(userEmail) || { geminiApiKey: '', githubPatToken: '' }
+    const GEMINI_API_KEY = settings.geminiApiKey || process.env.GEMINI_API_KEY;
+
+    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY!)
 
     const { owner, repo, baseBranch, targetBranch } = await request.json()
 

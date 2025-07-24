@@ -1,7 +1,10 @@
 // components/PRDetails.tsx
-import { GitPullRequest, Edit3, Send, ExternalLink, CheckCircle, Loader2 } from 'lucide-react'
+import { GitPullRequest, Edit3, Send, ExternalLink, CheckCircle, Loader2, Eye, FileText } from 'lucide-react'
+import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardAction } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
@@ -27,6 +30,12 @@ export default function PRDetails({
   onDescriptionChange,
   onCreatePR,
 }: PRDetailsProps) {
+  const [isPreview, setIsPreview] = useState(false)
+
+  const togglePreview = () => {
+    setIsPreview((prev) => !prev)
+  }
+
   if (!prDescription) return null
 
   return (
@@ -41,6 +50,27 @@ export default function PRDetails({
             <CardDescription>Review and customize your PR</CardDescription>
           </div>
         </div>
+        <CardAction>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={togglePreview}
+            aria-label={isPreview ? "Switch to markdown editor" : "Switch to preview mode"}
+            className="flex items-center gap-1"
+          >
+            {isPreview ? (
+              <>
+                <FileText className="h-4 w-4" />
+                <span className="hidden sm:inline">Edit</span>
+              </>
+            ) : (
+              <>
+                <Eye className="h-4 w-4" />
+                <span className="hidden sm:inline">Preview</span>
+              </>
+            )}
+          </Button>
+        </CardAction>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* PR Title */}
@@ -57,21 +87,38 @@ export default function PRDetails({
         {/* Generated Description */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="pr-description">Generated Description</Label>
+            <Label htmlFor="pr-description">
+              {isPreview ? "Preview" : "Generated Description"}
+            </Label>
             <Badge variant="secondary" className="text-xs">
               AI Generated
             </Badge>
           </div>
-          <Textarea
-            id="pr-description"
-            value={prDescription}
-            onChange={e => onDescriptionChange(e.target.value)}
-            rows={14}
-            className="font-mono text-sm resize-none"
-            placeholder="Generated description will appear here..."
-          />
+          
+          {isPreview ? (
+            <div 
+              className={cn(
+                "prose prose-sm dark:prose-invert max-w-none rounded-md border bg-card p-4 min-h-[300px] overflow-auto",
+                "font-sans text-sm"
+              )}
+            >
+              <ReactMarkdown>{prDescription}</ReactMarkdown>
+            </div>
+          ) : (
+            <Textarea
+              id="pr-description"
+              value={prDescription}
+              onChange={e => onDescriptionChange(e.target.value)}
+              rows={14}
+              className="font-mono text-sm resize-none"
+              placeholder="Generated description will appear here..."
+            />
+          )}
+          
           <p className="text-xs text-muted-foreground">
-            You can edit the description above to match your preferences
+            {isPreview 
+              ? "Preview mode shows how your markdown will appear in the PR" 
+              : "You can edit the description above to match your preferences"}
           </p>
         </div>
 
