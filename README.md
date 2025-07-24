@@ -76,7 +76,7 @@ openssl rand -base64 32
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to see your application!
+Visit [http://localhost:3000](http://localhost:3000) to see your application
 
 ## 🔧 Configuration
 
