@@ -113,8 +113,8 @@ export default function SettingsPage() {
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold">Settings</h1>
-              <p className="text-sm text-muted-foreground">Configure your DevFlow preferences</p>
+              <h1 className="text-lg font-bold">Settings</h1>
+              <p className="text-xs text-muted-foreground">Configure your DevFlow preferences</p>
             </div>
           </div>
         </div>

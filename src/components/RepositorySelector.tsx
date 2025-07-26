@@ -13,9 +13,10 @@ import {
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { RefreshCw, GitBranch, Database, Loader2, Check } from 'lucide-react'
+import { RefreshCw, GitBranch, Database, Loader2, Check, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
+import { TFormat, TMode } from '@/app/page'
 
 interface Repository {
   id: number
@@ -39,13 +40,29 @@ interface RepositorySelectorProps {
   branches: Branch[]
   baseBranch: string
   targetBranch: string
+  mode: TMode
+  format: TFormat
   loading: boolean
   onRepoSelect: (repo: Repository | null) => void
   onBaseBranchChange: (branch: string) => void
   onTargetBranchChange: (branch: string) => void
+  onModeChange: (mode: TMode) => void
+  onFormatChange: (format: TFormat) => void
   onRefreshRepos: () => void
   onGenerateDescription: () => void
 }
+
+const modeOptions = [
+  { value: 'patch', label: 'Patch Analysis', description: 'Analyze code diffs' },
+  { value: 'commit', label: 'Commit Messages', description: 'Use commit messages' },
+  { value: 'algo', label: 'Algorithm Based', description: 'Use fallback algorithm' },
+]
+
+const formatOptions = [
+  { value: 'simple', label: 'Simple', description: 'Short bullet points' },
+  { value: 'categorized', label: 'Categorized', description: 'Grouped by type' },
+  { value: 'detailed', label: 'Detailed', description: 'Comprehensive description' },
+]
 
 export default function RepositorySelector({
   repositories,
@@ -53,16 +70,22 @@ export default function RepositorySelector({
   branches,
   baseBranch,
   targetBranch,
+  mode,
+  format,
   loading,
   onRepoSelect,
   onBaseBranchChange,
   onTargetBranchChange,
+  onModeChange,
+  onFormatChange,
   onRefreshRepos,
   onGenerateDescription,
 }: RepositorySelectorProps) {
   const [repoOpen, setRepoOpen] = useState(false)
   const [baseOpen, setBaseOpen] = useState(false)
   const [targetOpen, setTargetOpen] = useState(false)
+  const [modeOpen, setModeOpen] = useState(false)
+  const [formatOpen, setFormatOpen] = useState(false)
 
   return (
     <Card>
@@ -100,7 +123,7 @@ export default function RepositorySelector({
                 <Command>
                   <CommandInput placeholder="Search repositories..." />
                   <CommandEmpty>No repositories found.</CommandEmpty>
-                  <CommandGroup className='h-64 overflow-y-auto'>
+                  <CommandGroup className='max-h-64 overflow-y-auto'>
                     {repositories.map(repo => (
                       <CommandItem
                         key={repo.id}
@@ -144,13 +167,14 @@ export default function RepositorySelector({
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-full justify-between truncate">
                       {baseBranch || 'Select base branch...'}
+                      <ChevronDown className='w-4 h-4'/>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-full p-0">
                     <Command>
                       <CommandInput placeholder="Search branches..." />
                       <CommandEmpty>No branches found.</CommandEmpty>
-                      <CommandGroup className='h-64 w-80 overflow-y-auto'>
+                      <CommandGroup className='max-h-64 w-80 overflow-y-auto'>
                         {branches.map(branch => (
                           <CommandItem
                             key={branch.name}
@@ -183,13 +207,14 @@ export default function RepositorySelector({
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-full justify-between truncate">
                       {targetBranch || 'Select target branch...'}
+                      <ChevronDown className='w-4 h-4'/>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-full p-0">
                     <Command>
                       <CommandInput placeholder="Search branches..." />
                       <CommandEmpty>No branches found.</CommandEmpty>
-                      <CommandGroup className='h-64 w-80 overflow-y-auto'>
+                      <CommandGroup className='max-h-64 w-80 overflow-y-auto'>
                         {branches
                           .filter(branch => branch.name !== baseBranch)
                           .map(branch => (
@@ -218,12 +243,101 @@ export default function RepositorySelector({
               </div>
             </div>
 
+            {/* Analysis Options */}              
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Mode Selection */}
+              <div className="space-y-2">
+                <Label>Analysis Mode</Label>
+                <Popover open={modeOpen} onOpenChange={setModeOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-between truncate">
+                      <span className="truncate">
+                        {modeOptions.find(opt => opt.value === mode)?.label || 'Select mode...'}
+                      </span>
+                      <ChevronDown className='w-4 h-4'/>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-1" align="start">
+                    <div className="space-y-1">
+                      {modeOptions.map(option => (
+                        <button
+                          key={option.value}
+                          onClick={() => {
+                            onModeChange(option.value as TMode)
+                            setModeOpen(false)
+                          }}
+                          className={cn(
+                            "w-full flex items-start gap-2 px-2 py-2 text-left rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors",
+                            mode === option.value && "bg-accent text-accent-foreground"
+                          )}
+                        >
+                          <Check
+                            className={cn(
+                              'h-4 w-4 mt-0.5 flex-shrink-0',
+                              mode === option.value ? 'opacity-100' : 'opacity-0'
+                            )}
+                          />
+                          <div className="flex flex-col min-w-0">
+                            <span className="font-medium text-sm">{option.label}</span>
+                            <span className="text-xs text-muted-foreground">{option.description}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Format Selection */}
+              <div className="space-y-2">
+                <Label>Output Format</Label>
+                <Popover open={formatOpen} onOpenChange={setFormatOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-between truncate">
+                      <span className="truncate">
+                        {formatOptions.find(opt => opt.value === format)?.label || 'Select format...'}
+                      </span>
+                      <ChevronDown className='w-4 h-4'/>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-1" align="start">
+                    <div className="space-y-1">
+                      {formatOptions.map(option => (
+                        <button
+                          key={option.value}
+                          onClick={() => {
+                            onFormatChange(option.value as TFormat)
+                            setFormatOpen(false)
+                          }}
+                          className={cn(
+                            "w-full flex items-start gap-2 px-2 py-2 text-left rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors",
+                            format === option.value && "bg-accent text-accent-foreground"
+                          )}
+                        >
+                          <Check
+                            className={cn(
+                              'h-4 w-4 mt-0.5 flex-shrink-0',
+                              format === option.value ? 'opacity-100' : 'opacity-0'
+                            )}
+                          />
+                          <div className="flex flex-col min-w-0">
+                            <span className="font-medium text-sm">{option.label}</span>
+                            <span className="text-xs text-muted-foreground">{option.description}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+
             {/* Generate Button */}
             <Button
               onClick={onGenerateDescription}
               disabled={!baseBranch || !targetBranch || loading}
               className="w-full"
-              size="lg"
+              size="default"
             >
               {loading ? (
                 <>

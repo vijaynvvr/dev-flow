@@ -35,6 +35,9 @@ interface DiffStatsType {
   commits: number
 }
 
+export type TMode = 'patch' | 'commit' | 'algo'
+export type TFormat = 'simple' | 'categorized' | 'detailed'
+
 export default function Home() {
   const { data: session, status } = useSession()
   const [repositories, setRepositories] = useState<Repository[]>([])
@@ -47,6 +50,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [diffStats, setDiffStats] = useState<DiffStatsType | null>(null)
   const [createdPrUrl, setCreatedPrUrl] = useState('')
+  const [mode, setMode] = useState<TMode>('commit')
+  const [format, setFormat] = useState<TFormat>('categorized')
 
   // Fetch repositories
   const fetchRepositories = async () => {
@@ -99,6 +104,8 @@ export default function Home() {
           repo: selectedRepo.name,
           baseBranch,
           targetBranch,
+          mode: mode || 'patch',
+          format: format || 'detailed',
         }),
       })
 
@@ -227,6 +234,10 @@ export default function Home() {
               onTargetBranchChange={setTargetBranch}
               onRefreshRepos={fetchRepositories}
               onGenerateDescription={generateDescription}
+              mode={mode}
+              format={format}
+              onModeChange={setMode}
+              onFormatChange={setFormat}
             />
 
             {/* Diff Stats */}
