@@ -1,6 +1,5 @@
 import NextAuth from 'next-auth'
 import GitHub from 'next-auth/providers/github'
-import { userSettings } from './lib/utils'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -22,9 +21,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return token
     },
     async session({ session, token }) {
-      const userEmail = session.user.email;
-      const settings = userSettings.get(userEmail) || { geminiApiKey: '', githubPatToken: '' }
-      session.accessToken = (settings.githubPatToken || token.accessToken) as string
+      session.accessToken = token.accessToken as string
       return session
     },
   },

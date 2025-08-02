@@ -3,7 +3,7 @@ import { auth } from '@/auth'
 import { Octokit } from '@octokit/rest'
 import { components } from '@octokit/openapi-types'
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { userSettings } from '@/lib/utils'
+import { getUserSettings } from '@/lib/settings'
 
 type GitHubFile = components['schemas']['diff-entry']
 type GitHubCommit = components['schemas']['commit']
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     }
 
     const userEmail = session.user.email
-    const settings = userSettings.get(userEmail) || { geminiApiKey: '', githubPatToken: '' }
+    const settings = await getUserSettings(userEmail)
     const GEMINI_API_KEY = settings.geminiApiKey || process.env.GEMINI_API_KEY
 
     const { owner, repo, baseBranch, targetBranch, mode = 'patch', format = 'detailed' } = await request.json()

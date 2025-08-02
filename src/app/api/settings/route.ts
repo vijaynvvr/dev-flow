@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
-import { userSettings } from '@/lib/utils'
+import { getUserSettings, saveUserSettings } from '@/lib/settings'
 
 export async function GET() {
   const session = await auth()
@@ -11,7 +11,7 @@ export async function GET() {
   }
 
   const userEmail = session.user.email
-  const settings = userSettings.get(userEmail) || { geminiApiKey: '', githubPatToken: '' }
+  const settings = await getUserSettings(userEmail)
 
   return NextResponse.json(settings)
 }
@@ -35,11 +35,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Invalid GitHub PAT token format' }, { status: 400 })
     }
 
-    // Store the user settings
-    userSettings.set(userEmail, {
+    const success = await saveUserSettings(userEmail, {
       geminiApiKey: geminiApiKey || '',
       githubPatToken: githubPatToken || '',
     })
+
+    if (!success) {
+      return NextResponse.json({ message: 'Failed to save settings' }, { status: 500 })
+    }
 
     return NextResponse.json({ success: true })
   } catch (error) {

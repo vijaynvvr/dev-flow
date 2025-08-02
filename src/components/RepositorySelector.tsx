@@ -53,15 +53,39 @@ interface RepositorySelectorProps {
 }
 
 const modeOptions = [
-  { value: 'patch', label: 'Patch Analysis', description: 'Analyze code diffs' },
-  { value: 'commit', label: 'Commit Messages', description: 'Use commit messages' },
-  { value: 'algo', label: 'Algorithm Based', description: 'Use fallback algorithm' },
+  { 
+    value: 'patch', 
+    label: 'Patch Analysis', 
+    description: 'Analyzes actual code changes and diffs to understand what was modified'
+  },
+  { 
+    value: 'commit', 
+    label: 'Commit Messages', 
+    description: 'Uses commit messages from the branch to generate description'
+  },
+  { 
+    value: 'algo', 
+    label: 'Algorithm Based', 
+    description: 'Fast offline analysis without AI - categorizes changes by file patterns'
+  },
 ]
 
 const formatOptions = [
-  { value: 'simple', label: 'Simple', description: 'Short bullet points' },
-  { value: 'categorized', label: 'Categorized', description: 'Grouped by type' },
-  { value: 'detailed', label: 'Detailed', description: 'Comprehensive description' },
+  { 
+    value: 'simple', 
+    label: 'Simple', 
+    description: 'Concise bullet points summarizing key changes'
+  },
+  { 
+    value: 'categorized', 
+    label: 'Categorized', 
+    description: 'Changes grouped by type: Features, Fixes, Refactors, etc.'
+  },
+  { 
+    value: 'detailed', 
+    label: 'Detailed', 
+    description: 'Comprehensive description with context and reasoning'
+  },
 ]
 
 export default function RepositorySelector({
