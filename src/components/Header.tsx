@@ -17,7 +17,7 @@ export default function Header() {
     
     try {
       setIsSigningOut(true)
-      await signOut()
+      await signOut({ callbackUrl: '/' })
     } catch (error) {
       console.error('Sign out error:', error)
       setIsSigningOut(false) // Reset on error
