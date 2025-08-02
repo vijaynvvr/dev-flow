@@ -14,6 +14,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
+  session: {
+    maxAge: 24 * 60 * 60, // 1 day in seconds
+  },
   callbacks: {
     async jwt({ token, account }) {
       if (account?.provider === 'github') {
