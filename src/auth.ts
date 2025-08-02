@@ -1,6 +1,6 @@
 import NextAuth from 'next-auth'
 import GitHub from 'next-auth/providers/github'
-import { saveUserSettings } from './lib/settings'
+import { createEmptyUserSettings } from './lib/settings'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -28,10 +28,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async signIn({ user, account }) {
       if (account?.provider === 'github' && user.email) {
         try {
-          await saveUserSettings(user.email, {
-            geminiApiKey: '',
-            githubPatToken: '',
-          })
+          await createEmptyUserSettings(user.email)
         } catch (error) {
           console.error('Error creating user settings on sign-in:', error)
         }

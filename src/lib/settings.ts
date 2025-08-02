@@ -30,6 +30,30 @@ export async function getUserSettings(userEmail: string): Promise<UserSettingsDa
   }
 }
 
+export async function createEmptyUserSettings(userEmail: string): Promise<boolean> {
+  try {
+    const existingSettings = await db
+      .select()
+      .from(userSettings)
+      .where(eq(userSettings.userEmail, userEmail))
+      .limit(1)
+
+    if (existingSettings.length === 0) {
+      await db.insert(userSettings).values({
+        id: crypto.randomUUID(),
+        userEmail,
+        geminiApiKey: null,
+        githubPatToken: null,
+        updatedAt: new Date(),
+      })
+    }
+    return true
+  } catch (error) {
+    console.error('Error creating empty user settings:', error)
+    return false
+  }
+}
+
 export async function saveUserSettings(
   userEmail: string,
   settings: UserSettingsData
