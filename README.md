@@ -43,7 +43,7 @@ npm install next-auth@beta @octokit/rest @google/generative-ai lucide-react clas
 npm install -D @types/node
 ```
 
-2. **Setup environment variables:**
+2. **Setup environment variables**
 
 ```bash
 # Copy the environment template
