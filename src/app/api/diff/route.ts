@@ -73,17 +73,15 @@ export async function POST(request: NextRequest) {
     const userEmail = session.user.email
     const settings = await getUserSettings(userEmail)
     const GEMINI_API_KEY = settings.geminiApiKey || process.env.GEMINI_API_KEY
+    const accessToken = settings.githubPatToken || session.accessToken
 
-    const { owner, repo, baseBranch, targetBranch, mode = 'patch', format = 'detailed' } = await request.json()
-
-    console.log(mode, format);
-    
+    const { owner, repo, baseBranch, targetBranch, mode = 'patch', format = 'detailed' } = await request.json()    
 
     if (!owner || !repo || !baseBranch || !targetBranch) {
       return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 })
     }
 
-    const octokit = new Octokit({ auth: session.accessToken })
+    const octokit = new Octokit({ auth: accessToken })
     const { data: comparison } = await octokit.rest.repos.compareCommitsWithBasehead({
       owner,
       repo,
