@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { Octokit } from '@octokit/rest'
+import { getUserSettings } from '@/lib/settings'
 
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
 
-    if (!session?.accessToken) {
+    if (!session || !session.user?.email || !session?.accessToken) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -16,8 +17,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 })
     }
 
+    const userEmail = session.user.email
+    const settings = await getUserSettings(userEmail)
+    const accessToken = settings.githubPatToken || session.accessToken
+
     const octokit = new Octokit({
-      auth: session.accessToken,
+      auth: accessToken,
     })
 
     const { data: pr } = await octokit.rest.pulls.create({

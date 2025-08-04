@@ -1,17 +1,22 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { Octokit } from '@octokit/rest'
+import { getUserSettings } from '@/lib/settings'
 
 export async function GET() {
   try {
     const session = await auth()
 
-    if (!session?.accessToken) {
+    if (!session || !session.user?.email || !session?.accessToken) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const userEmail = session.user.email
+    const settings = await getUserSettings(userEmail)
+    const accessToken = settings.githubPatToken || session.accessToken
+
     const octokit = new Octokit({
-      auth: session.accessToken,
+      auth: accessToken,
     })
 
     const reposData = []
