@@ -2,7 +2,7 @@
 import { signIn } from 'next-auth/react'
 import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Github, GitPullRequest, Sparkles, Zap, Shield, ArrowRight, Loader2, Star, Users, Clock } from 'lucide-react'
 import LoadingOverlay from './LoadingOverlay'
@@ -186,103 +186,166 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="bg-muted/30 py-20">
+      {/* Features Section - Redesigned with horizontal cards */}
+      <section className="bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 py-20">
         <div className="container mx-auto px-4">
           <div className="mb-16 text-center">
-            <h2 className="mb-6 text-4xl font-bold">Why Developers Love DevFlow</h2>
+            <Badge variant="outline" className="mb-4 px-4 py-2 text-primary border-primary/20 bg-primary/5">
+              <Zap className="mr-2 h-4 w-4" />
+              Key Features
+            </Badge>
+            <h2 className="mb-6 text-4xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+              Why Developers Love DevFlow
+            </h2>
             <p className="mx-auto max-w-2xl text-xl text-muted-foreground leading-relaxed">
               Save hours every week with intelligent automation that understands your code
             </p>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-3">
-            {/* Feature 1 */}
-            <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-b from-card to-muted/20">
-              <CardHeader className="text-center pb-4">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-r from-primary to-blue-600 text-primary-foreground shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <Zap className="h-8 w-8" />
+          <div className="max-w-4xl mx-auto space-y-6">
+            {/* Feature 1 - Horizontal Layout */}
+            <div className="group relative overflow-hidden rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/60 dark:border-slate-700/60 p-8 hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="flex-shrink-0">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-600 rounded-2xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
+                    <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg">
+                      <Zap className="h-10 w-10" />
+                    </div>
+                  </div>
                 </div>
-                <CardTitle className="text-xl">Lightning Fast</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-center leading-relaxed">
-                  Generate comprehensive PR descriptions in under 10 seconds. No more staring at
-                  blank description boxes.
-                </CardDescription>
-              </CardContent>
-            </Card>
+                <div className="flex-1 text-center md:text-left">
+                  <h3 className="text-2xl font-bold mb-3 text-slate-800 dark:text-slate-100">Lightning Fast</h3>
+                  <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Generate comprehensive PR descriptions in under 10 seconds. No more staring at blank description boxes—our AI understands your code changes instantly.
+                  </p>
+                </div>
+              </div>
+            </div>
 
-            {/* Feature 2 */}
-            <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-b from-card to-muted/20">
-              <CardHeader className="text-center pb-4">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-r from-primary to-purple-600 text-primary-foreground shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <Sparkles className="h-8 w-8" />
+            {/* Feature 2 - Horizontal Layout */}
+            <div className="group relative overflow-hidden rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/60 dark:border-slate-700/60 p-8 hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
+              <div className="flex flex-col md:flex-row-reverse items-center gap-6">
+                <div className="flex-shrink-0">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-600 rounded-2xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
+                    <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg">
+                      <Sparkles className="h-10 w-10" />
+                    </div>
+                  </div>
                 </div>
-                <CardTitle className="text-xl">AI-Powered</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-center leading-relaxed">
-                  Advanced AI analyzes your code diff, commit messages, and file changes to create
-                  meaningful descriptions.
-                </CardDescription>
-              </CardContent>
-            </Card>
+                <div className="flex-1 text-center md:text-right">
+                  <h3 className="text-2xl font-bold mb-3 text-slate-800 dark:text-slate-100">AI-Powered Intelligence</h3>
+                  <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Advanced AI analyzes your code diff, commit messages, and file changes to create meaningful, context-aware descriptions that capture the essence of your work.
+                  </p>
+                </div>
+              </div>
+            </div>
 
-            {/* Feature 3 */}
-            <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-b from-card to-muted/20">
-              <CardHeader className="text-center pb-4">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-r from-primary to-green-600 text-primary-foreground shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <Shield className="h-8 w-8" />
+            {/* Feature 3 - Horizontal Layout */}
+            <div className="group relative overflow-hidden rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/60 dark:border-slate-700/60 p-8 hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="flex-shrink-0">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-600 rounded-2xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
+                    <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg">
+                      <Shield className="h-10 w-10" />
+                    </div>
+                  </div>
                 </div>
-                <CardTitle className="text-xl">Secure & Private</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-center leading-relaxed">
-                  Your code never leaves GitHub. We only analyze diffs through secure OAuth
-                  integration.
-                </CardDescription>
-              </CardContent>
-            </Card>
+                <div className="flex-1 text-center md:text-left">
+                  <h3 className="text-2xl font-bold mb-3 text-slate-800 dark:text-slate-100">Secure & Private</h3>
+                  <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Your code never leaves GitHub. We only analyze diffs through secure OAuth integration, ensuring your intellectual property remains completely protected.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* How it Works */}
-      <section className="py-20">
+      {/* How it Works - Redesigned with timeline/flow style */}
+      <section className="py-20 bg-gradient-to-b from-background to-muted/20 relative overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="mb-16 text-center">
+            <Badge variant="secondary" className="mb-4 px-4 py-2">
+              <ArrowRight className="mr-2 h-4 w-4" />
+              Process
+            </Badge>
             <h2 className="mb-6 text-4xl font-bold">How It Works</h2>
             <p className="text-xl text-muted-foreground leading-relaxed">Simple 3-step process to better PRs</p>
           </div>
 
-          <div className="grid gap-12 md:grid-cols-3">
-            <div className="text-center group">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-r from-primary to-blue-600 text-xl font-bold text-primary-foreground shadow-lg group-hover:scale-110 transition-transform duration-300">
-                1
+          <div className="max-w-5xl mx-auto">
+            <div className="relative">
+              {/* Connecting Line */}
+              <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent transform -translate-y-1/2 hidden lg:block"></div>
+              
+              <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-4">
+                {/* Step 1 */}
+                <div className="flex-1 group relative">
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-3xl p-8 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative z-10 h-80 flex flex-col justify-center">
+                    <div className="mx-auto inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-2xl font-bold mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      1
+                    </div>
+                    <h3 className="text-2xl font-bold mb-4 text-blue-700 dark:text-blue-400">Connect GitHub</h3>
+                    <p className="text-muted-foreground text-lg leading-relaxed">
+                      Sign in with GitHub and select your repository to get started
+                    </p>
+                    <div className="mt-6 flex justify-center">
+                      <div className="w-12 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Arrow 1 */}
+                <div className="hidden lg:flex items-center justify-center">
+                  <div className="bg-primary/10 rounded-full p-3">
+                    <ArrowRight className="h-6 w-6 text-primary" />
+                  </div>
+                </div>
+
+                {/* Step 2 */}
+                <div className="flex-1 group relative">
+                  <div className="bg-gradient-to-br from-primary/5 to-purple/5 border-2 border-primary/20 rounded-3xl p-8 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative z-10 h-80 flex flex-col justify-center">
+                    <div className="mx-auto inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-primary to-purple-600 text-white text-2xl font-bold mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      2
+                    </div>
+                    <h3 className="text-2xl font-bold mb-4">Choose Branches</h3>
+                    <p className="text-muted-foreground text-lg leading-relaxed">
+                      Choose your branches to analyze code changes and differences
+                    </p>
+                    <div className="mt-6 flex justify-center">
+                      <div className="w-12 h-1 bg-gradient-to-r from-primary via-purple-500 to-transparent rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Arrow 2 */}
+                <div className="hidden lg:flex items-center justify-center">
+                  <div className="bg-primary/10 rounded-full p-3">
+                    <ArrowRight className="h-6 w-6 text-primary" />
+                  </div>
+                </div>
+
+                {/* Step 3 */}
+                <div className="flex-1 group relative">
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-200 dark:border-green-800 rounded-3xl p-8 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative z-10 h-80 flex flex-col justify-center">
+                    <div className="mx-auto inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white text-2xl font-bold mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      3
+                    </div>
+                    <h3 className="text-2xl font-bold mb-4 text-green-700 dark:text-green-400">Generate & Create</h3>
+                    <p className="text-muted-foreground text-lg leading-relaxed">
+                      AI generates perfect PR descriptions and creates them instantly
+                    </p>
+                    <div className="mt-6 flex justify-center">
+                      <div className="w-12 h-1 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <h3 className="mb-4 text-xl font-semibold">Connect GitHub</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Sign in with your GitHub account and select your repository
-              </p>
-            </div>
-            <div className="text-center group">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-r from-primary to-purple-600 text-xl font-bold text-primary-foreground shadow-lg group-hover:scale-110 transition-transform duration-300">
-                2
-              </div>
-              <h3 className="mb-4 text-xl font-semibold">Choose Branches</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Select your base and target branches to analyze the changes
-              </p>
-            </div>
-            <div className="text-center group">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-r from-primary to-green-600 text-xl font-bold text-primary-foreground shadow-lg group-hover:scale-110 transition-transform duration-300">
-                3
-              </div>
-              <h3 className="mb-4 text-xl font-semibold">Generate & Create</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                AI creates the description and you can create the PR instantly
-              </p>
             </div>
           </div>
         </div>

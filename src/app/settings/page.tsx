@@ -157,7 +157,7 @@ export default function SettingsPage() {
                       <p className="text-xs text-muted-foreground">Followers</p>
                     </div>
                   </div>
-                  <Button variant="outline" className="w-full" onClick={() => window.open(githubUser.html_url, '_blank')}>
+                  <Button variant="default" className="w-full" onClick={() => window.open(githubUser.html_url, '_blank')}>
                     <Github className="mr-2 h-4 w-4" />
                     View GitHub Profile
                   </Button>
@@ -202,7 +202,7 @@ export default function SettingsPage() {
                       onChange={(e) => setGeminiApiKey(e.target.value)} 
                     />
                     <p className="text-xs text-muted-foreground">
-                      Provide your own Gemini API key to use Google&apos;s LLM for generating PR descriptions. 
+                      Configure your Gemini API key for uninterrupted AI assistance 
                       <a 
                         href="https://ai.google.dev/tutorials/setup" 
                         target="_blank" 
@@ -224,7 +224,7 @@ export default function SettingsPage() {
                       onChange={(e) => setGithubPatToken(e.target.value)} 
                     />
                     <p className="text-xs text-muted-foreground">
-                      Add a GitHub Personal Access Token with &lsquo;repo&lsquo; scope to access private repositories. 
+                      Connect your GitHub PAT for seamless access to private/organization repositories. 
                       <a 
                         href="https://github.com/settings/tokens" 
                         target="_blank" 

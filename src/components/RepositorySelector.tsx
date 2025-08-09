@@ -17,6 +17,7 @@ import { RefreshCw, GitBranch, Database, Loader2, Check, ChevronDown } from 'luc
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
 import { TFormat, TMode } from '@/app/page'
+import SettingsBanner from '@/components/SettingsBanner'
 
 interface Repository {
   id: number
@@ -110,6 +111,7 @@ export default function RepositorySelector({
   const [targetOpen, setTargetOpen] = useState(false)
   const [modeOpen, setModeOpen] = useState(false)
   const [formatOpen, setFormatOpen] = useState(false)
+  const [showBanner, setShowBanner] = useState(true)
 
   return (
     <Card>
@@ -177,6 +179,15 @@ export default function RepositorySelector({
           </div>
           {selectedRepo?.description && (
             <p className="text-sm text-muted-foreground">{selectedRepo.description}</p>
+          )}
+          
+          {/* Settings Banner */}
+          {showBanner && (
+            <div className="mt-3">
+              <SettingsBanner 
+                onDismiss={() => setShowBanner(false)}
+              />
+            </div>
           )}
         </div>
 

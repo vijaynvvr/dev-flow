@@ -47,16 +47,15 @@ export default function Header() {
 
             {/* User Info & Actions */}
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8">
+              <div className="flex items-center gap-2">
+                <Avatar className="h-6 w-6">
                   <AvatarImage src={session?.user?.image || ''} alt={session?.user?.name || ''} />
                   <AvatarFallback>
                     {session?.user?.name?.charAt(0).toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
-                <div className="hidden sm:block">
-                  <p className="text-sm font-medium">{session?.user?.name}</p>
-                  <p className="text-xs text-muted-foreground">Developer</p>
+                <div className="hidden sm:block text-sm font-medium">
+                  {session?.user?.name}
                 </div>
               </div>
 
