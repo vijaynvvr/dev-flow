@@ -1,10 +1,17 @@
 import { eq } from 'drizzle-orm'
-import { db, userSettings, type UserSettings, type NewUserSettings } from './db'
+import { db, userSettings } from './db'
 import { encrypt, decrypt } from './encryption'
 
 export interface UserSettingsData {
   geminiApiKey?: string
   githubPatToken?: string
+  geminiKeyExpiresAt?: Date
+  githubTokenExpiresAt?: Date
+}
+
+function isCredentialExpired(expiresAt: Date | null): boolean {
+  if (!expiresAt) return false
+  return new Date() > expiresAt
 }
 
 export async function getUserSettings(userEmail: string): Promise<UserSettingsData> {
@@ -20,12 +27,17 @@ export async function getUserSettings(userEmail: string): Promise<UserSettingsDa
     }
 
     const settings = result[0]
+    const geminiExpired = isCredentialExpired(settings.geminiKeyExpiresAt)
+    const githubExpired = isCredentialExpired(settings.githubTokenExpiresAt)
+    
     return {
-      geminiApiKey: settings.geminiApiKey ? decrypt(settings.geminiApiKey) : '',
-      githubPatToken: settings.githubPatToken ? decrypt(settings.githubPatToken) : '',
+      geminiApiKey: settings.geminiApiKey && !geminiExpired ? decrypt(settings.geminiApiKey, userEmail) : '',
+      githubPatToken: settings.githubPatToken && !githubExpired ? decrypt(settings.githubPatToken, userEmail) : '',
+      geminiKeyExpiresAt: settings.geminiKeyExpiresAt || undefined,
+      githubTokenExpiresAt: settings.githubTokenExpiresAt || undefined,
     }
   } catch (error) {
-    console.error('Error fetching user settings:', error)
+    console.error('Failed to fetch user settings')
     return { geminiApiKey: '', githubPatToken: '' }
   }
 }
@@ -44,12 +56,14 @@ export async function createEmptyUserSettings(userEmail: string): Promise<boolea
         userEmail,
         geminiApiKey: null,
         githubPatToken: null,
+        geminiKeyExpiresAt: null,
+        githubTokenExpiresAt: null,
         updatedAt: new Date(),
       })
     }
     return true
   } catch (error) {
-    console.error('Error creating empty user settings:', error)
+    console.error('Failed to create user settings')
     return false
   }
 }
@@ -59,10 +73,15 @@ export async function saveUserSettings(
   settings: UserSettingsData
 ): Promise<boolean> {
   try {
+    const defaultExpiration = new Date()
+    defaultExpiration.setMonth(defaultExpiration.getMonth() + 6)
+    
     const encryptedSettings = {
       userEmail,
-      geminiApiKey: settings.geminiApiKey ? encrypt(settings.geminiApiKey) : null,
-      githubPatToken: settings.githubPatToken ? encrypt(settings.githubPatToken) : null,
+      geminiApiKey: settings.geminiApiKey ? encrypt(settings.geminiApiKey, userEmail) : null,
+      githubPatToken: settings.githubPatToken ? encrypt(settings.githubPatToken, userEmail) : null,
+      geminiKeyExpiresAt: settings.geminiApiKey ? (settings.geminiKeyExpiresAt || defaultExpiration) : null,
+      githubTokenExpiresAt: settings.githubPatToken ? (settings.githubTokenExpiresAt || defaultExpiration) : null,
       updatedAt: new Date(),
     }
 
@@ -86,7 +105,7 @@ export async function saveUserSettings(
 
     return true
   } catch (error) {
-    console.error('Error saving user settings:', error)
+    console.error('Failed to save user settings')
     return false
   }
 }

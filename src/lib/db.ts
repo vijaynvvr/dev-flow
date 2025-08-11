@@ -14,6 +14,8 @@ export const userSettings = pgTable('user_settings', {
   userEmail: varchar('user_email', { length: 255 }).notNull().unique(),
   geminiApiKey: text('gemini_api_key'),
   githubPatToken: text('github_pat_token'),
+  geminiKeyExpiresAt: timestamp('gemini_key_expires_at'),
+  githubTokenExpiresAt: timestamp('github_token_expires_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })

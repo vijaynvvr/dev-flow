@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const userEmail = session.user.email
-    const { geminiApiKey, githubPatToken } = await request.json()
+    const { geminiApiKey, githubPatToken, geminiKeyExpiresAt, githubTokenExpiresAt } = await request.json()
 
     if (geminiApiKey && typeof geminiApiKey !== 'string') {
       return NextResponse.json({ message: 'Invalid Gemini API key format' }, { status: 400 })
@@ -38,6 +38,8 @@ export async function POST(request: NextRequest) {
     const success = await saveUserSettings(userEmail, {
       geminiApiKey: geminiApiKey || '',
       githubPatToken: githubPatToken || '',
+      geminiKeyExpiresAt: geminiKeyExpiresAt ? new Date(geminiKeyExpiresAt) : undefined,
+      githubTokenExpiresAt: githubTokenExpiresAt ? new Date(githubTokenExpiresAt) : undefined,
     })
 
     if (!success) {
