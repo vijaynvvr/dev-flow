@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
         const prompt = buildPrompt(mode === 'commit' ? commits : files, mode, format)
         console.log("prompt: ", prompt);
         
-        const result = await model.generateContent(prompt)
+        const result = await model.generateContent([prompt]);
         description = result.response.text()
       } catch (e) {
         console.error('LLM failed, using fallback:', e)
