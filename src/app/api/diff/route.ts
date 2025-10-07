@@ -100,6 +100,9 @@ export async function POST(request: NextRequest) {
       try {
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY!)
         const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        const available = await genAI.listModels();
+        console.log("available list of models: ", available);
+
         const prompt = buildPrompt(mode === 'commit' ? commits : files, mode, format)
         console.log("prompt: ", prompt);
         
