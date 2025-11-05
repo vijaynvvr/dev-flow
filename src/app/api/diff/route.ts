@@ -11,14 +11,83 @@ type TMode = 'patch' | 'commit' | 'algo'
 type TFormat = 'simple' | 'categorized' | 'detailed'
 
 function buildPrompt(data: GitHubFile[] | GitHubCommit[], mode: TMode, format: TFormat): string {
+  // Prepare the data in a more understandable format
+  const isCommitMode = mode === 'commit'
+  const dataType = isCommitMode ? 'commit messages of pull request' : 'file diffs of pull request '
   const base = (mode === 'commit')
     ? (data as GitHubCommit[]).map(c => c.commit.message).join('\n')
-    : (data as GitHubFile[]).map(f => `File: ${f.filename}\nChanges: +${f.additions} -${f.deletions}\n${f.patch?.slice(0, 1000) || ''}`).join('\n---\n')
+    : (data as GitHubFile[]).map(f => `${f.status.toUpperCase()}: ${f.filename}\nChanges: +${f.additions} -${f.deletions}\n${f.patch?.slice(0, 1000) || ''}`).join('\n---\n')
 
   const prompts = {
-    simple: `Summarize the following ${mode === 'commit' ? 'commit messages' : 'code changes'} in short bullet points.\n${base}`.trim(),
-    categorized: `Group the following ${mode === 'commit' ? 'commit messages' : 'diffs'} into categories:\n\n🚀 Features\n🛠 Fixes\n🧼 Refactors\n🧹 Clean-up\n📝 Docs / Chores\n\nOnly include relevant sections.\n\n${base}`.trim(),
-    detailed: `Generate a detailed PR description for the following ${mode === 'commit' ? 'commit messages' : 'diffs'}.\nInclude purpose, implications, and reasoning if possible.\n\n${base}`.trim(),
+    simple: `You are analyzing ${dataType}. 
+
+Your task: Create a concise summary focusing on WHAT changed from a user/feature perspective, not technical file details.
+
+Guidelines:
+- Focus on features, functionality, and business logic changes
+- Avoid listing individual files unless critical
+- Group related changes together
+- Use clear, non-technical language where possible
+- Keep it brief
+
+${dataType.toUpperCase()}:
+${base}
+
+Generate a simple bullet-point summary of the key changes.`,
+
+    categorized: `You are analyzing ${dataType}.
+
+Your task: Categorize changes by their PURPOSE and IMPACT, not by file types or names.
+
+CRITICAL INSTRUCTIONS:
+- Think about WHAT functionality changed, not WHERE it changed
+- Group related changes that work together to achieve a feature
+- Describe changes in terms of user-facing impact or system behavior
+- Avoid simply listing file names - explain what those changes accomplish
+- Only include categories that have meaningful changes
+
+Categories to use (only include relevant ones):
+🚀 **New Features** - New capabilities or functionality added
+🛠 **Bug Fixes** - Issues resolved or corrections made  
+🔧 **Improvements** - Enhancements to existing features
+♻️ **Refactoring** - Code restructuring without behavior changes
+🎨 **UI/UX Changes** - Visual or user experience updates
+📚 **Documentation** - README, comments, or docs updates
+🧪 **Testing** - Test additions or modifications
+⚙️ **Configuration** - Build, deployment, or config changes
+
+${dataType.toUpperCase()}:
+${base}
+
+Analyze these changes and create a categorized description focusing on FUNCTIONALITY.`,
+
+    detailed: `You are writing a comprehensive pull request description based on ${dataType}.
+
+Your task: Create a detailed, feature-focused PR description that explains the changes from a high-level perspective.
+
+Structure your response with:
+
+## Summary
+A brief overview (2-3 sentences) of what this PR accomplishes and why it's needed.
+
+## Key Changes
+Detailed explanation of the main changes, focusing on:
+- What functionality was added, modified, or removed
+- Why these changes were necessary
+- How they improve the system or user experience
+- Any important architectural or design decisions
+
+## Impact
+- What areas of the application are affected
+- Any breaking changes or migration requirements
+- Performance or security implications
+
+CRITICAL: Focus on the WHAT and WHY, not the technical implementation details or file names. Write as if explaining to a product manager or team lead.
+
+${dataType.toUpperCase()}:
+${base}
+
+Generate a comprehensive PR description following the structure above.`,
   }
 
   return prompts[format] || prompts.detailed
@@ -26,39 +95,55 @@ function buildPrompt(data: GitHubFile[] | GitHubCommit[], mode: TMode, format: T
 
 function fallbackAlgo(files: GitHubFile[]) {
   const categorized: Record<string, string[]> = {
-    '🚀 Features': [],
-    '🛠 Fixes': [],
-    '🧼 Refactors': [],
-    '🧹 Clean-up': [],
-    '📝 Docs / Chores': [],
-    '📁 Renamed / Copied': [],
-    '➖ Removed': [],
+    '🚀 New Features': [],
+    '🛠 Bug Fixes': [],
+    '🔧 Improvements': [],
+    '♻️ Refactoring': [],
+    '🎨 UI/UX Changes': [],
+    '📚 Documentation': [],
+    '🧪 Testing': [],
+    '⚙️ Configuration': [],
+    '📁 File Operations': [],
   } 
 
   for (const file of files) {
-    const { filename, status } = file
+    const { filename, status, additions, deletions } = file
+    const isNewFile = status === 'added'
+    const isRemoved = status === 'removed'
+    const isTest = filename.includes('.test.') || filename.includes('.spec.') || filename.includes('__tests__')
+    const isConfig = filename.match(/\.(json|yml|yaml|toml|config\.)/) || filename.includes('package.json')
+    const isDoc = filename.match(/\.(md|txt|rst)$/i) || filename.toLowerCase().includes('readme')
+    const isUI = filename.match(/\.(css|scss|sass|less|jsx|tsx|vue|svelte)$/)
 
-    if (status === 'added') {
-      categorized['🚀 Features'].push(`- Added ${filename}`)
-    } else if (status === 'removed') {
-      categorized['➖ Removed'].push(`- Removed ${filename}`)
-    } else if (status === 'modified') {
-      if (filename.includes('fix')) {
-        categorized['🛠 Fixes'].push(`- Updated ${filename}`)
-      } else {
-        categorized['🧼 Refactors'].push(`- Modified ${filename}`)
-      }
-    } else if (status === 'renamed' || status === 'copied') {
-      categorized['📁 Renamed / Copied'].push(`- ${status === 'renamed' ? 'Renamed' : 'Copied'} ${filename}`)
-    } else if (filename.includes('README') || filename.endsWith('.md')) {
-      categorized['📝 Docs / Chores'].push(`- Updated ${filename}`)
+    // Smarter categorization based on context
+    if (isDoc) {
+      categorized['📚 Documentation'].push(`Updated documentation in ${filename}`)
+    } else if (isTest) {
+      categorized['🧪 Testing'].push(`${isNewFile ? 'Added' : 'Updated'} tests`)
+    } else if (isConfig) {
+      categorized['⚙️ Configuration'].push(`Modified configuration`)
+    } else if (isRemoved) {
+      categorized['♻️ Refactoring'].push(`Removed unused code`)
+    } else if (isNewFile && additions > 50) {
+      categorized['🚀 New Features'].push(`Added new functionality`)
+    } else if (isUI) {
+      categorized['🎨 UI/UX Changes'].push(`Updated user interface`)
+    } else if (filename.toLowerCase().includes('fix')) {
+      categorized['🛠 Bug Fixes'].push(`Fixed issues`)
+    } else if (additions > deletions * 2) {
+      categorized['🔧 Improvements'].push(`Enhanced existing features`)
     } else {
-      categorized['🧹 Clean-up'].push(`- Changed ${filename}`)
+      categorized['♻️ Refactoring'].push(`Refactored code`)
     }
   }
 
   return Object.entries(categorized)
-    .map(([header, items]) => `${header}\n${items.join('\n') || `- No ${header.toLowerCase()}`}`)
+    .filter(([_, items]) => items.length > 0)
+    .map(([header, items]) => {
+      // Deduplicate similar items
+      const uniqueItems = [...new Set(items)]
+      return `### ${header}\n${uniqueItems.map(item => `- ${item}`).join('\n')}`
+    })
     .join('\n\n')
     .trim()
 }
@@ -99,8 +184,13 @@ export async function POST(request: NextRequest) {
     } else {
       try {
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY!)
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-
+        const model = genAI.getGenerativeModel({ 
+          model: 'gemini-1.5-flash',
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2048,
+          }
+        })
         const prompt = buildPrompt(mode === 'commit' ? commits : files, mode, format)
         console.log("prompt: ", prompt);
         
