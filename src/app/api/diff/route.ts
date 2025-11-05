@@ -30,6 +30,8 @@ Guidelines:
 - Use clear, non-technical language where possible
 - Keep it brief
 
+IMPORTANT: Output ONLY the PR description. Do NOT include conversational phrases like "Here's the categorization", "I've grouped", or "Based on the changes".
+
 ${dataType.toUpperCase()}:
 ${base}
 
@@ -40,9 +42,9 @@ Generate a simple bullet-point summary of the key changes.`,
 Your task: Categorize changes by their PURPOSE and IMPACT, not by file types or names.
 
 CRITICAL INSTRUCTIONS:
-- Think about WHAT functionality changed, not WHERE it changed
 - Group related changes that work together to achieve a feature
 - Describe changes in terms of user-facing impact or system behavior
+- Describe about code based changes only if necessary to understand the context
 - Avoid simply listing file names - explain what those changes accomplish
 - Only include categories that have meaningful changes
 
@@ -56,33 +58,50 @@ Categories to use (only include relevant ones):
 🧪 **Testing** - Test additions or modifications
 ⚙️ **Configuration** - Build, deployment, or config changes
 
+IMPORTANT: Output ONLY the PR description. Do NOT include conversational phrases like "Here's the categorization", "I've grouped", or "Based on the changes".
+
 ${dataType.toUpperCase()}:
 ${base}
 
-Analyze these changes and create a categorized description focusing on FUNCTIONALITY.`,
+Analyze these changes and create a categorized description.`,
 
     detailed: `You are writing a comprehensive pull request description based on ${dataType}.
 
-Your task: Create a detailed, feature-focused PR description that explains the changes from a high-level perspective.
+Your task: Create a detailed, technical PR description that thoroughly explains the changes with sufficient technical depth.
 
 Structure your response with:
 
 ## Summary
-A brief overview (2-3 sentences) of what this PR accomplishes and why it's needed.
+A clear overview (2-3 sentences) of what this PR accomplishes and the problem it solves.
 
-## Key Changes
-Detailed explanation of the main changes, focusing on:
-- What functionality was added, modified, or removed
-- Why these changes were necessary
-- How they improve the system or user experience
-- Any important architectural or design decisions
+## Changes Made
+Provide a detailed, technical breakdown of the changes:
+- Specific components, functions, or modules that were modified
+- New APIs, endpoints, or interfaces introduced
+- Database schema changes or data model updates
+- Algorithm or logic changes with technical reasoning
+- Dependencies added or updated
+- Technical decisions made and why
 
-## Impact
-- What areas of the application are affected
-- Any breaking changes or migration requirements
-- Performance or security implications
+## Technical Details
+- Implementation approach and patterns used
+- Code organization and architectural changes
+- How different parts of the code interact
+- Any complex logic or algorithms worth explaining
+- Error handling and edge cases addressed
+
+## Impact & Considerations
+- Which parts of the codebase are affected
+- Breaking changes and migration steps required
+- Performance implications with specifics
+- Security considerations
+- Testing approach and coverage
+
+Focus on providing enough technical detail that another developer can understand the implementation without reading every line of code. Include specifics about what was changed and how it works.
 
 CRITICAL: Focus on the WHAT and WHY, not the technical implementation details or file names. Write as if explaining to a product manager or team lead.
+
+IMPORTANT: Output ONLY the PR description. Do NOT include conversational phrases like "Here's the categorization", "I've grouped", or "Based on the changes".
 
 ${dataType.toUpperCase()}:
 ${base}
