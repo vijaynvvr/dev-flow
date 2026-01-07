@@ -44,7 +44,7 @@ export default function Home() {
   const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null)
   const [branches, setBranches] = useState<Branch[]>([])
   const [baseBranch, setBaseBranch] = useState('')
-  const [targetBranch, setTargetBranch] = useState('')
+  const [currentBranch, setCurrentBranch] = useState('')
   const [prDescription, setPrDescription] = useState('')
   const [prTitle, setPrTitle] = useState('')
   const [loading, setLoading] = useState(false)
@@ -91,7 +91,7 @@ export default function Home() {
 
   // Generate PR description
   const generateDescription = async () => {
-    if (!selectedRepo || !baseBranch || !targetBranch) return
+    if (!selectedRepo || !baseBranch || !currentBranch) return
 
     try {
       setLoading(true)
@@ -103,7 +103,7 @@ export default function Home() {
           owner: selectedRepo.owner,
           repo: selectedRepo.name,
           baseBranch,
-          targetBranch,
+          currentBranch,
           mode: mode || 'patch',
           format: format || 'detailed',
         }),
@@ -114,7 +114,7 @@ export default function Home() {
         setPrDescription(result.description)
         setDiffStats(result.stats)
         if (!prTitle) {
-          setPrTitle(`feat: merge ${targetBranch} into ${baseBranch}`)
+          setPrTitle(`feat: merge ${currentBranch} into ${baseBranch}`)
         }
 
         // Show warning if fallback was used
@@ -142,7 +142,7 @@ export default function Home() {
 
   // Create pull request
   const createPullRequest = async () => {
-    if (!selectedRepo || !baseBranch || !targetBranch || !prTitle || !prDescription) return
+    if (!selectedRepo || !baseBranch || !currentBranch || !prTitle || !prDescription) return
 
     try {
       setLoading(true)
@@ -154,7 +154,7 @@ export default function Home() {
           repo: selectedRepo.name,
           title: prTitle,
           body: prDescription,
-          head: targetBranch,
+          head: currentBranch,
           base: baseBranch,
         }),
       })
@@ -179,7 +179,7 @@ export default function Home() {
     setSelectedRepo(repo)
     setBranches([])
     setBaseBranch('')
-    setTargetBranch('')
+    setCurrentBranch('')
     setPrDescription('')
     setPrTitle('')
     setDiffStats(null)
@@ -227,11 +227,11 @@ export default function Home() {
               selectedRepo={selectedRepo}
               branches={branches}
               baseBranch={baseBranch}
-              targetBranch={targetBranch}
+              currentBranch={currentBranch}
               loading={loading}
               onRepoSelect={handleRepoSelect}
               onBaseBranchChange={setBaseBranch}
-              onTargetBranchChange={setTargetBranch}
+              onCurrentBranchChange={setCurrentBranch}
               onRefreshRepos={fetchRepositories}
               onGenerateDescription={generateDescription}
               mode={mode}

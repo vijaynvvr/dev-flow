@@ -179,9 +179,9 @@ export async function POST(request: NextRequest) {
     const GEMINI_API_KEY = settings.geminiApiKey || process.env.GEMINI_API_KEY
     const accessToken = settings.githubPatToken || session.accessToken
 
-    const { owner, repo, baseBranch, targetBranch, mode = 'patch', format = 'detailed' } = await request.json()    
+    const { owner, repo, baseBranch, currentBranch, mode = 'patch', format = 'detailed' } = await request.json()    
 
-    if (!owner || !repo || !baseBranch || !targetBranch) {
+    if (!owner || !repo || !baseBranch || !currentBranch) {
       return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 })
     }
 
@@ -189,7 +189,7 @@ export async function POST(request: NextRequest) {
     const { data: comparison } = await octokit.rest.repos.compareCommitsWithBasehead({
       owner,
       repo,
-      basehead: `${baseBranch}...${targetBranch}`,
+      basehead: `${baseBranch}...${currentBranch}`,
     })
 
     const files = comparison.files || []

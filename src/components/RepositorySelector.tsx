@@ -40,13 +40,13 @@ interface RepositorySelectorProps {
   selectedRepo: Repository | null
   branches: Branch[]
   baseBranch: string
-  targetBranch: string
+  currentBranch: string
   mode: TMode
   format: TFormat
   loading: boolean
   onRepoSelect: (repo: Repository | null) => void
   onBaseBranchChange: (branch: string) => void
-  onTargetBranchChange: (branch: string) => void
+  onCurrentBranchChange: (branch: string) => void
   onModeChange: (mode: TMode) => void
   onFormatChange: (format: TFormat) => void
   onRefreshRepos: () => void
@@ -94,13 +94,13 @@ export default function RepositorySelector({
   selectedRepo,
   branches,
   baseBranch,
-  targetBranch,
+  currentBranch,
   mode,
   format,
   loading,
   onRepoSelect,
   onBaseBranchChange,
-  onTargetBranchChange,
+  onCurrentBranchChange,
   onModeChange,
   onFormatChange,
   onRefreshRepos,
@@ -108,7 +108,7 @@ export default function RepositorySelector({
 }: RepositorySelectorProps) {
   const [repoOpen, setRepoOpen] = useState(false)
   const [baseOpen, setBaseOpen] = useState(false)
-  const [targetOpen, setTargetOpen] = useState(false)
+  const [currentOpen, setCurrentOpen] = useState(false)
   const [modeOpen, setModeOpen] = useState(false)
   const [formatOpen, setFormatOpen] = useState(false)
   const [showBanner, setShowBanner] = useState(true)
@@ -235,13 +235,13 @@ export default function RepositorySelector({
                 </Popover>
               </div>
 
-              {/* Target Branch */}
+              {/* Current Branch */}
               <div className="space-y-2">
-                <Label>Target Branch</Label>
-                <Popover open={targetOpen} onOpenChange={setTargetOpen}>
+                <Label>Current Branch</Label>
+                <Popover open={currentOpen} onOpenChange={setCurrentOpen}>
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-full justify-between truncate">
-                      {targetBranch || 'Select target branch...'}
+                      {currentBranch || 'Select current branch...'}
                       <ChevronDown className='w-4 h-4'/>
                     </Button>
                   </PopoverTrigger>
@@ -257,14 +257,14 @@ export default function RepositorySelector({
                               key={branch.name}
                               value={branch.name}
                               onSelect={() => {
-                                onTargetBranchChange(branch.name)
-                                setTargetOpen(false)
+                                onCurrentBranchChange(branch.name)
+                                setCurrentOpen(false)
                               }}
                             >
                               <Check
                                 className={cn(
                                   'mr-2 h-4 w-4',
-                                  targetBranch === branch.name ? 'opacity-100' : 'opacity-0'
+                                  currentBranch === branch.name ? 'opacity-100' : 'opacity-0'
                                 )}
                               />
                               <span className="truncate">{branch.name}</span>{' '}
@@ -370,7 +370,7 @@ export default function RepositorySelector({
             {/* Generate Button */}
             <Button
               onClick={onGenerateDescription}
-              disabled={!baseBranch || !targetBranch || loading}
+              disabled={!baseBranch || !currentBranch || loading}
               className="w-full"
               size="default"
             >
