@@ -118,9 +118,13 @@ export default function Home() {
         }
 
         // Show warning if fallback was used
-        if (result.fallback) {
+        if (result.fallback && result.prompt) {
+          await copyToClipboard(result.prompt)
+
           alert(
-            'AI service temporarily unavailable. Generated a basic description. You can edit it before creating the PR.'
+            '⚠️ AI generation failed.\n\n' +
+            'The exact prompt was copied to your clipboard.\n' +
+            'You can paste it into ChatGPT, Gemini, or any LLM to generate the PR description manually.'
           )
         }
       } else {
@@ -171,6 +175,14 @@ export default function Home() {
       alert('Failed to create pull request')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch (e) {
+      console.error('Clipboard copy failed', e)
     }
   }
 

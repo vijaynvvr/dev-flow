@@ -197,10 +197,18 @@ export async function POST(request: NextRequest) {
 
     let description = ''
     let fallback = false
+    let usedPrompt: string | null = null
+
 
     if (mode === 'algo') {
       description = fallbackAlgo(files)
     } else {
+      const prompt = buildPrompt(
+        mode === 'commit' ? commits : files,
+        mode,
+        format
+      )
+      usedPrompt = prompt
       try {
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY!)
         const model = genAI.getGenerativeModel({ 
@@ -210,7 +218,6 @@ export async function POST(request: NextRequest) {
             maxOutputTokens: 2048,
           }
         })
-        const prompt = buildPrompt(mode === 'commit' ? commits : files, mode, format)
         console.log("prompt: ", prompt);
         
         const result = await model.generateContent([prompt]);
@@ -231,6 +238,7 @@ export async function POST(request: NextRequest) {
         commits: commits.length,
       },
       fallback,
+      prompt: fallback ? usedPrompt : null,
     })
   } catch (error) {
     console.error('Diff generation failed:', error)
