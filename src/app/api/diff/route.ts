@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
           model: 'gemini-2.0-flash',
           generationConfig: {
             temperature: 0.7,
-            maxOutputTokens: 2048,
+            maxOutputTokens: 8192,
           }
         })
         console.log("prompt: ", prompt);
