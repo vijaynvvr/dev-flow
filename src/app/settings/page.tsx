@@ -125,7 +125,7 @@ export default function SettingsPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <User className="h-5 w-5" />
                 </div>
-                <div>
+                <div className='space-y-1'>
                   <CardTitle>GitHub Account</CardTitle>
                   <CardDescription>Your connected GitHub account details</CardDescription>
                 </div>
@@ -179,7 +179,7 @@ export default function SettingsPage() {
                 <div className="shrink-0 flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <Key className="h-5 w-5" />
                 </div>
-                <div>
+                <div className='space-y-1'>
                   <CardTitle>API Keys & Tokens</CardTitle>
                   <CardDescription>Configure custom API keys for enhanced functionality</CardDescription>
                 </div>

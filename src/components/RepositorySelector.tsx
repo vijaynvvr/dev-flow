@@ -120,7 +120,7 @@ export default function RepositorySelector({
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Database className="h-5 w-5" />
           </div>
-          <div>
+          <div className='space-y-1'>
             <CardTitle>Repository Setup</CardTitle>
             <CardDescription>Choose your repository and branches</CardDescription>
           </div>
