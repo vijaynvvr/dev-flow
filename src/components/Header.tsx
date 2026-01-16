@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { GitPullRequest, LogOut, Loader2, Settings } from 'lucide-react'
 import LoadingOverlay from '@/components/LoadingOverlay'
+import { ThemeToggler } from '@/providers/ThemeProvider'
 
 export default function Header() {
   const { data: session } = useSession()
@@ -14,7 +15,7 @@ export default function Header() {
 
   const handleSignOut = async () => {
     if (isSigningOut) return // Prevent multiple clicks
-    
+
     try {
       setIsSigningOut(true)
       await signOut({ callbackUrl: '/' })
@@ -39,7 +40,7 @@ export default function Header() {
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <GitPullRequest className="h-5 w-5" />
               </div>
-              <div>
+              <div className="hidden md:block">
                 <h1 className="text-xl font-bold">DevFlow</h1>
                 <p className="text-xs text-muted-foreground">PR Description Generator</p>
               </div>
@@ -47,6 +48,23 @@ export default function Header() {
 
             {/* User Info & Actions */}
             <div className="flex items-center gap-4">
+              <ThemeToggler />
+
+              <Button variant="ghost" size="sm" onClick={navigateToSettings} aria-label="Settings">
+                <Settings className="h-4 w-4" />
+                <span className="ml-2 hidden md:inline">Settings</span>
+              </Button>
+
+              <Button variant="ghost" size="sm" onClick={handleSignOut} disabled={isSigningOut}>
+                {isSigningOut ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <LogOut className="h-4 w-4" />
+                )}
+                <span className="ml-2 hidden md:inline">
+                  {isSigningOut ? 'Signing out...' : 'Sign out'}
+                </span>
+              </Button>
               <div className="flex items-center gap-2">
                 <Avatar className="h-6 w-6">
                   <AvatarImage src={session?.user?.image || ''} alt={session?.user?.name || ''} />
@@ -54,36 +72,8 @@ export default function Header() {
                     {session?.user?.name?.charAt(0).toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
-                <div className="hidden sm:block text-sm font-medium">
-                  {session?.user?.name}
-                </div>
+                <div className="hidden md:block text-sm font-medium">{session?.user?.name}</div>
               </div>
-
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={navigateToSettings}
-                aria-label="Settings"
-              >
-                <Settings className="h-4 w-4" />
-                <span className="ml-2 hidden sm:inline">Settings</span>
-              </Button>
-
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleSignOut}
-                disabled={isSigningOut}
-              >
-                {isSigningOut ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <LogOut className="h-4 w-4" />
-                )}
-                <span className="ml-2 hidden sm:inline">
-                  {isSigningOut ? 'Signing out...' : 'Sign out'}
-                </span>
-              </Button>
             </div>
           </div>
         </div>

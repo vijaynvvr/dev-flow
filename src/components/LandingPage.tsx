@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Github, GitPullRequest, Sparkles, Zap, Shield, ArrowRight, Loader2, Star, Users, Clock } from 'lucide-react'
 import LoadingOverlay from './LoadingOverlay'
+import { ThemeToggler } from '@/providers/ThemeProvider'
 
 export default function LandingPage() {
   const [isSigningIn, setIsSigningIn] = useState(false)
@@ -71,25 +72,28 @@ export default function LandingPage() {
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <GitPullRequest className="h-5 w-5" />
               </div>
-              <span className="text-xl font-bold">DevFlow</span>
+              <span className="text-xl font-bold">DevFlow</span>              
             </div>
-            <Button
-              onClick={handleSignIn}
-              variant="outline"
-              disabled={isSigningIn}
-            >
-              {isSigningIn ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing In...
-                </>
-              ) : (
-                <>
-                  <Github className="mr-2 h-4 w-4" />
-                  Sign In
-                </>
-              )}
-            </Button>
+            <div className='flex items-center gap-4'>
+              <ThemeToggler />
+              <Button
+                onClick={handleSignIn}
+                variant="outline"
+                disabled={isSigningIn}
+              >
+                {isSigningIn ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Signing In...
+                  </>
+                ) : (
+                  <>
+                    <Github className="mr-2 h-4 w-4" />
+                    Sign In
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </header>
