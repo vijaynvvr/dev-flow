@@ -22,7 +22,7 @@ interface GenerateResult {
 }
 
 export async function generateWithFallback(options: GenerateOptions): Promise<GenerateResult> {
-  const { apiKey, prompt, temperature = 0.4, maxOutputTokens = 2048 } = options
+  const { apiKey, prompt, temperature = 0.4, maxOutputTokens = 8192 } = options
 
   const genAI = new GoogleGenerativeAI(apiKey)
 
